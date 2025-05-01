@@ -46,7 +46,9 @@ export default function SimulationResults() {
             </div>
           </div>
           <div className="ml-5 w-[22%] max-md:ml-0 max-md:w-full">
-            <div className="flex shrink-0 mx-auto mt-96 bg-blue-600 h-[108px] rounded-[78px] w-[108px] max-md:mt-10" />
+            <div className="flex shrink-0 mx-auto mt-96 bg-blue-600 h-[108px] rounded-[78px] w-[108px] max-md:mt-10">
+              <img src=""/>
+            </div>
           </div>
         </div>
       </div>

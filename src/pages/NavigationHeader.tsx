@@ -3,11 +3,11 @@ import logo from "../assets/logo.svg";
 
 export default function NavigationHeader() {
   return (
-    <header className="flex flex-wrap gap-5 justify-between ml-20 max-w-full text-black w-[1600px]">
+    <header className="flex flex-wrap gap-5 justify-between max-w-full text-black w-[1600px]">
       <img
         src={logo}
         alt="AVAD website logo"
-        className="object-contain shrink-0 my-auto w-50 aspect-square"
+        className="object-contain shrink-0 my-auto w-55 aspect-square"
       />
       <nav className="flex flex-wrap gap-5 items-center text-3xl font-medium whitespace-nowrap">
         <div className="self-stretch my-auto w-[205px]">
