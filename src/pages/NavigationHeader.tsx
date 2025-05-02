@@ -1,35 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import logo from "../assets/logo.svg";
 
 export default function NavigationHeader() {
+  const [activePage, setActivePage] = useState("Overview");
+
+  const navItems = ["Overview", "Analysis", "Docs", "Logs"];
+
   return (
-    <header className="flex flex-wrap gap-5 justify-between max-w-full text-black w-[1600px]">
+    <header className="flex items-center justify-between max-w-screen-xl mx-auto">
       <img
         src={logo}
         alt="AVAD website logo"
-        className="object-contain shrink-0 my-auto w-55 aspect-square"
+        className="h-24 w-auto object-contain"
       />
-      <nav className="flex flex-wrap gap-5 items-center text-3xl font-medium whitespace-nowrap">
-        <div className="self-stretch my-auto w-[205px]">
-          <button className="px-5 py-10 w-full bg-white rounded-[58px] max-md:px-5 hover:bg-black hover:text-white transition-colors duration-300">
-            Overview
+
+      <nav className="flex space-x-4 text-lg font-medium">
+        {navItems.map((label) => (
+          <button
+            key={label}
+            onClick={() => setActivePage(label)}
+            className={`px-6 py-3 rounded-full transition-colors duration-300 ${
+              activePage === label
+                ? "bg-white text-black shadow-md"
+                : "bg-zinc-100 text-gray-700"
+            } hover:bg-black hover:text-white`}
+          >
+            {label}
           </button>
-        </div>
-        <div className="self-stretch my-auto w-[205px]">
-          <button className="px-5 py-10 w-full bg-zinc-100 rounded-[58px] max-md:px-5 hover:bg-black hover:text-white transition-colors duration-300">
-            Analysis
-          </button>
-        </div>
-        <div className="self-stretch my-auto w-[205px]">
-          <button className="px-5 py-10 w-full bg-zinc-100 rounded-[58px] max-md:px-5 hover:bg-black hover:text-white transition-colors duration-300">
-            Docs
-          </button>
-        </div>
-        <div className="self-stretch my-auto w-[205px]">
-          <button className="px-5 py-10 w-full bg-zinc-100 rounded-[58px] max-md:px-5 hover:bg-black hover:text-white transition-colors duration-300">
-            Logs
-          </button>
-        </div>
+        ))}
       </nav>
     </header>
   );

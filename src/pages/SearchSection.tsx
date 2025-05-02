@@ -1,56 +1,89 @@
-import React from "react";
+import React, { useState, ChangeEvent } from "react";
 
 export default function SearchSection() {
+  const [query, setQuery] = useState<string>("");
+  const [result, setResult] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleSearch = async () => {
+    if (!query) return;
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:3001/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+
+      const data = await response.json();
+      setResult(data.result ?? "No result.");
+
+      await fetch("http://localhost:3001/api/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query, data }),
+      });
+    } catch (err) {
+      console.error(err);
+      setResult("Error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+  };
+
   return (
-    <section className="flex-auto self-end mt-24 max-md:mt-10 max-md:max-w-full">
-      <div className="flex items-center justify-end gap-5 max-md:flex-col">
-        <div className="max-md:ml-0 max-md:w-full">
-          <div className="py-12 pr-6 pl-14 mx-auto w-full bg-white rounded-[139px] max-md:px-5 max-md:mt-8 max-md:max-w-full">
-            <div className="flex items-center justify-between gap-5 max-md:flex-col">
-              <div className="w-[32%] max-md:ml-0 max-md:w-full">
-                <h3 className="self-stretch my-auto text-4xl font-medium text-black max-md:mt-10">
-                  Fast insight
-                </h3>
-              </div>
-              <div className="ml-5 w-[68%] max-md:ml-0 max-md:w-full">
-                <div className="flex gap-3 items-center max-md:mt-10">
-                  <div className="flex gap-5 self-stretch px-6 py-8 text-2xl font-medium whitespace-nowrap bg-neutral-100 rounded-[83px] text-neutral-400 max-md:px-5">
-                    <img
-                      src="https://cdn.builder.io/api/v1/image/assets/TEMP/a631e4c1da67674545ddc7dd18b7081bd0433371?placeholderIfAbsent=true&apiKey=06583fef677b467aaaac25278e1414ed"
-                      alt="Search icon"
-                      className="object-contain shrink-0 my-auto w-6 aspect-square"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Search..."
-                      className="bg-transparent outline-none"
-                    />
-                  </div>
-                  <button className="flex flex-col justify-center items-center self-stretch px-5 my-auto bg-blue-600 h-[90px] rounded-[78px] w-[90px]">
-                    <img
-                      src="https://cdn.builder.io/api/v1/image/assets/TEMP/09ff8fd9ccf7489619bf186645607b79a5874192?placeholderIfAbsent=true&apiKey=06583fef677b467aaaac25278e1414ed"
-                      alt="Primary action"
-                      className="object-contain w-8 aspect-square"
-                    />
-                  </button>
-                  <button className="flex flex-col justify-center items-center self-stretch px-5 my-auto bg-neutral-100 h-[90px] rounded-[78px] w-[90px]">
-                    <img
-                      src="https://cdn.builder.io/api/v1/image/assets/TEMP/6eb6ca00148c039ce50f9c72208ec1efdf606c89?placeholderIfAbsent=true&apiKey=06583fef677b467aaaac25278e1414ed"
-                      alt="Secondary action"
-                      className="object-contain w-8 aspect-square"
-                    />
-                  </button>
-                </div>
-              </div>
-            </div>
+    <>
+      <section>
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-6 bg-white p-6 rounded-3xl shadow">
+          <h3 className="text-xl font-semibold text-gray-800">Fast Insight</h3>
+
+          <div className="flex flex-1 items-center gap-2 bg-neutral-100 rounded-full px-4 py-2">
+            <input
+              type="text"
+              value={query}
+              onChange={handleInputChange}
+              placeholder="Search..."
+              className="flex-1 bg-transparent text-gray-900 text-sm outline-none"
+            />
+            <button
+              onClick={handleSearch}
+              disabled={loading}
+              aria-label="Search"
+              className="w-5 h-5 bg-center bg-contain bg-no-repeat hover:scale-110 transition-transform"
+              style={{
+                backgroundImage:
+                  'url("https://cdn.builder.io/api/v1/image/assets/TEMP/a631e4c1da67674545ddc7dd18b7081bd0433371?placeholderIfAbsent=true&apiKey=06583fef677b467aaaac25278e1414ed")',
+              }}
+            />
           </div>
-        </div>
-        <div className="ml-5 w-[30%] max-md:ml-0 max-md:w-full">
-          <button className="grow px-14 py-12 w-full text-4xl font-medium text-white bg-blue-600 rounded-[139px] max-md:px-5 max-md:mt-8">
+
+          <button className="px-5 py-2 text-sm bg-blue-600 text-white rounded-full hover:bg-blue-700">
             Predict Outcome
           </button>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {result && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
+          <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-xl border">
+            <h4 className="text-lg font-semibold mb-2">You asked:</h4>
+            <p className="text-gray-600 mb-4">{query}</p>
+            <h4 className="text-lg font-semibold mb-2">AI response:</h4>
+            <p className="text-gray-900 whitespace-pre-line">{result}</p>
+            <button
+              onClick={() => setResult("")}
+              className="mt-4 text-sm text-blue-500 hover:underline"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

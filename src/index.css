@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+@viewport {
+    width: fit-content;
+    zoom: 0.6;
+  }
