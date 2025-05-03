@@ -39,7 +39,7 @@ export default function SearchSection() {
   return (
     <>
       <section>
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-6 bg-white p-6 rounded-3xl shadow">
+        <div className="w-3xl mx-auto flex flex-col md:flex-row items-center gap-6 bg-white p-6 rounded-3xl shadow">
           <h3 className="text-xl font-semibold text-gray-800">Fast Insight</h3>
 
           <div className="flex flex-1 items-center gap-2 bg-neutral-100 rounded-full px-4 py-2">
