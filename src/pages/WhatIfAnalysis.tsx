@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function WhatIfAnalysis() {
   return (
     <article className="flex relative flex-col py-6 pr-2.5 pl-8 w-full min-h-[608px] rounded-[53px] max-md:pl-5 max-md:mt-5 max-md:max-w-full">
