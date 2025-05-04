@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import NavigationHeader from "./NavigationHeader";
 import OverviewHeader from "./OverviewHeader";
 import SearchSection from "./SearchSection";
@@ -7,7 +6,6 @@ import StatusCard from "./StatusCard";
 import SimulationResults from "./SimulationResults";
 import SensorCapture from "./SensorCapture";
 import DynamicChart from "./DynamicChart";
-import LVADSystem from "./LVADSystem";
 
 import { Amplify } from 'aws-amplify';
 

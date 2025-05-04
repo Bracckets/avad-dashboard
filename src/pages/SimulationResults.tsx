@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function SimulationResults() {
   return (
     <article className="px-5 py-6 w-full bg-white rounded-2xl shadow max-md:mt-5">

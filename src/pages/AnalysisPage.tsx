@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import NavigationHeader from "./NavigationHeader";
 import OverviewHeader from "./OverviewHeader";
 import SearchSection from "./SearchSection";

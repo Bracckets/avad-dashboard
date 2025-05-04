@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent } from "react";
 
 export default function SearchSection() {
   const [query, setQuery] = useState<string>("");
