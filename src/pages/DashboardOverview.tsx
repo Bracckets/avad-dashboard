@@ -7,6 +7,7 @@ import SimulationResults from "./SimulationResults";
 import SensorCapture from "./SensorCapture";
 import DynamicChart from "./DynamicChart";
 
+
 import { Amplify } from 'aws-amplify';
 
 Amplify.configure({
@@ -15,7 +16,7 @@ Amplify.configure({
       endpoint: "https://2at7hn3s5naprbau4t7txpc5eu.appsync-api.me-south-1.amazonaws.com/event",
       region: "me-south-1",
       defaultAuthMode: "apiKey",
-      apiKey: process.env.NEXT_PUBLIC_APPSYNC_API_KEY!,
+      apiKey: "da2-hzybh6piebfnbdwiuatyrndzgm"
     }
   }
 });
