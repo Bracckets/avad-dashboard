@@ -8,7 +8,7 @@ export default function NavigationHeader() {
 
   const navItems = [
     { label: "Overview", path: "/", disabled: false },
-    { label: "Analysis", path: "/analysis", disabled: true },
+    { label: "Analysis", path: "/analysis", disabled: false },
     { label: "Docs", path: "/docs", disabled: false },
     { label: "Logs", path: "/logs", disabled: true },
   ];

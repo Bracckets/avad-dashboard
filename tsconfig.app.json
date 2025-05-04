@@ -22,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "aws-exports.js", "apolloClient.js", "server.js"]
+  "include": ["src", "aws-exports.js", "src/apolloClient.js", "server.js"]
 }

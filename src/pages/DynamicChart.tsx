@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   LineChart,
   Line,
@@ -9,117 +9,96 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { ChevronDown } from "lucide-react";
+import { events } from "aws-amplify/data";
 
-// Dummy chart options with different data and labels
-const chartOptions = [
-  {
-    name: "Fluid Flow",
-    value: "fluid",
-    percentage: "85%",
-    data: [
-      { name: "Page A", uv: 4000, pv: 2400 },
-      { name: "Page B", uv: 3000, pv: 1398 },
-      { name: "Page C", uv: 2000, pv: 9800 },
-      { name: "Page D", uv: 2780, pv: 3908 },
-      { name: "Page E", uv: 1890, pv: 4800 },
-      { name: "Page F", uv: 2390, pv: 3800 },
-      { name: "Page G", uv: 3490, pv: 4300 },
-    ],
-  },
-  {
-    name: "Pressure",
-    value: "pressure",
-    percentage: "72%",
-    data: [
-      { name: "Page A", uv: 3200, pv: 2200 },
-      { name: "Page B", uv: 2500, pv: 1600 },
-      { name: "Page C", uv: 1900, pv: 7800 },
-      { name: "Page D", uv: 2600, pv: 3500 },
-      { name: "Page E", uv: 1700, pv: 4400 },
-      { name: "Page F", uv: 2100, pv: 3600 },
-      { name: "Page G", uv: 3000, pv: 3900 },
-    ],
-  },
-  {
-    name: "Velocity",
-    value: "velocity",
-    percentage: "64%",
-    data: [
-      { name: "Page A", uv: 2800, pv: 1800 },
-      { name: "Page B", uv: 2200, pv: 1400 },
-      { name: "Page C", uv: 1600, pv: 7000 },
-      { name: "Page D", uv: 2400, pv: 3100 },
-      { name: "Page E", uv: 1500, pv: 4200 },
-      { name: "Page F", uv: 2000, pv: 3300 },
-      { name: "Page G", uv: 2700, pv: 3700 },
-    ],
-  },
-];
+interface FlowDataPoint {
+  timestamp: string;
+  pump_flow: number | null;
+  total_flow: number | null;
+}
 
 export default function DynamicChart() {
-  const [selectedChart, setSelectedChart] = useState(chartOptions[0]);
+  const [data, setData] = useState<FlowDataPoint[]>([]);
+  const subscriptionRef = useRef<any>(null);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    const connectAndSubscribe = () => {
+      events.connect('/default/channel')
+        .then(channel => {
+          subscriptionRef.current = channel.subscribe({
+            next: (msg: any) => {
+              const { sensor_id, device_data, timestamp } = msg.event;
+              const value = device_data.value;
+              const ts = new Date(timestamp).toISOString();
+
+              setData(prev => {
+                const lastPoints = prev.slice(-29);
+                const last = lastPoints[lastPoints.length - 1];
+
+                if (last && last.timestamp === ts) {
+                  const updated = { ...last };
+                  if (sensor_id === 22) updated.pump_flow = value;
+                  if (sensor_id === 21) updated.total_flow = value;
+                  return [...lastPoints.slice(0, -1), updated];
+                }
+
+                const newPoint: FlowDataPoint = {
+                  timestamp: ts,
+                  pump_flow: sensor_id === 22 ? value : null,
+                  total_flow: sensor_id === 21 ? value : null,
+                };
+                return [...lastPoints, newPoint];
+              });
+            },
+            error: (err: any) => {
+              console.error('Subscription error:', err);
+              if (isMountedRef.current) setTimeout(connectAndSubscribe, 1000);
+            },
+          });
+        })
+        .catch(err => {
+          console.error('Connection error:', err);
+          if (isMountedRef.current) setTimeout(connectAndSubscribe, 1000);
+        });
+    };
+
+    connectAndSubscribe();
+
+    return () => {
+      isMountedRef.current = false;
+      if (subscriptionRef.current && subscriptionRef.current.unsubscribe) {
+        subscriptionRef.current.unsubscribe();
+      }
+    };
+  }, []);
 
   return (
     <article className="px-5 py-5 w-full bg-white rounded-xl shadow max-md:mt-6">
-      {/* Header with icon, title, and dropdown */}
-      <div className="flex justify-between items-center pb-5">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center w-20 h-20 bg-neutral-100 rounded-full">
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/eb39b4e98ac18294558802861fc161f25d946a89?placeholderIfAbsent=true&apiKey=06583fef677b467aaaac25278e1414ed"
-              alt={`${selectedChart.name} icon`}
-              className="w-10 h-10 object-contain"
-            />
-          </div>
-          <div className="text-black">
-            <h3 className="text-base font-light">{selectedChart.name}</h3>
-            <p className="mt-1 text-3xl font-bold max-md:text-2xl">
-              {selectedChart.percentage}
-            </p>
-          </div>
-        </div>
-
-        {/* Dropdown */}
-        <div className="relative">
-          <select
-            className="appearance-none text-sm bg-neutral-100 text-black font-medium py-2 px-4 pr-8 rounded-full shadow focus:outline-none cursor-pointer"
-            value={selectedChart.value}
-            onChange={(e) =>
-              setSelectedChart(
-                chartOptions.find((opt) => opt.value === e.target.value) ||
-                  chartOptions[0]
-              )
-            }
-          >
-            {chartOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.name}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="absolute top-2.5 right-3 w-4 h-4 text-black pointer-events-none" />
-        </div>
-      </div>
-
-      {/* Chart */}
+      <h3 className="text-xl font-semibold mb-4">Real-time Flow</h3>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart
-          data={selectedChart.data}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-        >
+        <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
+          <XAxis dataKey="timestamp" tickFormatter={v => v.slice(11, 19)} />
+          <YAxis domain={[0, 'auto']} unit=" ML/m" />
           <Tooltip />
           <Legend />
           <Line
             type="monotone"
-            dataKey="pv"
-            stroke="#8884d8"
-            activeDot={{ r: 8 }}
+            dataKey="pump_flow"
+            stroke="#3b82f6"
+            name="Pump Flow"
+            dot={false}
+            isAnimationActive={false}
           />
-          <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+          <Line
+            type="monotone"
+            dataKey="total_flow"
+            stroke="#10B981"
+            name="Total Flow"
+            dot={false}
+            isAnimationActive={false}
+          />
         </LineChart>
       </ResponsiveContainer>
     </article>
