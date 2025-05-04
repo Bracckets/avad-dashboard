@@ -15,7 +15,7 @@ Amplify.configure({
       endpoint: "https://2at7hn3s5naprbau4t7txpc5eu.appsync-api.me-south-1.amazonaws.com/event",
       region: "me-south-1",
       defaultAuthMode: "apiKey",
-      apiKey: import.meta.env.VITE_APPSYNC_API_KEY
+      apiKey: process.env.NEXT_PUBLIC_APPSYNC_API_KEY!,
     }
   }
 });
